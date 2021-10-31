@@ -4,7 +4,7 @@ require('dotenv').config()
 const ObjectId = require('mongodb').ObjectId;
 const app = express();
 const cors = require('cors');
-// const port = 5000; or process.env.PORI || 3000; 
+// const port = 5000; or process.env.PORT || 3000; 
 const port = process.env.PORT || 5000;
 
 
@@ -24,6 +24,7 @@ async function run() {
     console.log('database connected successfully');
     const database = client.db("tourPlan");
     const tourPlanCollection = database.collection("tourProducts");
+    const orderCollection = database.collection('orders')
 
     app.get('/ordernow/:id', async (req, res) => {
       const id = req.params.id;
@@ -31,6 +32,55 @@ async function run() {
       const tourProducts = await tourPlanCollection.findOne(query);
       // console.log('load user id', id);
       res.json(tourProducts);
+    });
+
+    //Get api(orders) detabase to ui ================
+      app.get('/orders', async (req, res)=>{
+        const cursor = orderCollection.find({});
+        const orders = await cursor.toArray();
+        res.send(orders);
+      });
+
+    //  DELETE API===========================
+    app.delete('/orders/:id', async (req,res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const result = await orderCollection.deleteOne(query);
+      console.log('delete user with id',result );
+      res.json(result);
+    } );
+
+    // UPDATE ORDERS pt-01==========================
+    app.get('/orders/:id', async (req, res)=>{
+     const id = req.params.id;
+     const query = {_id: ObjectId(id)};
+     const order = await orderCollection.findOne(query);
+     console.log('load with id', id);
+     res.send(order);
+    });
+  //  Update user and email pt-02===================
+  app.put('/orders/:id', async (req, res)=>{
+   const id = req.params.id;
+   const updatedUser = req.body;
+   const filter = {_id:ObjectId(id)};
+   const options = {upsert: true};
+   const updateDoc = {
+     $set:{
+       name: updatedUser.name,
+       email: updatedUser.email,
+     },
+   };
+   const result = await orderCollection.updateOne(filter, updateDoc,options)
+   console.log('updating user', req);
+   res.send(result);
+  });
+
+    //ADD ORDERS API  ui to database =========================
+    app.post('/orders',async (req,res)=>{
+     const newOrder = req.body;
+     const result = await orderCollection.insertOne(newOrder);
+     console.log('got newOrder', req.body);
+     res.send(result);
     })
 
     //GET TOURPRODUCTS API===============
