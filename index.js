@@ -5,7 +5,7 @@ const ObjectId = require('mongodb').ObjectId;
 const app = express();
 const cors = require('cors');
 // const port = 5000; or process.env.PORI || 3000; 
-const port = process.env.PORI || 5000; 
+const port = process.env.PORT || 5000;
 
 
 //MIDDLEWARE
@@ -19,43 +19,43 @@ console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 async function run() {
-    try {
-      await client.connect();
-      console.log('database connected successfully');
-      const database = client.db("tourPlan");
-      const tourPlanCollection = database.collection("tourProducts");
+  try {
+    await client.connect();
+    console.log('database connected successfully');
+    const database = client.db("tourPlan");
+    const tourPlanCollection = database.collection("tourProducts");
 
-      app.get('/ordernow/:id', async (req,res) =>{
-        const id = req.params.id;
-        const query = {_id:ObjectId(id)};
-        const tourProducts = await tourPlanCollection.findOne(query);
-        // console.log('load user id', id);
-        res.json(tourProducts);
-      })
+    app.get('/ordernow/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const tourProducts = await tourPlanCollection.findOne(query);
+      // console.log('load user id', id);
+      res.json(tourProducts);
+    })
 
-      //GET TOURPRODUCTS API===============
-      app.get('/tourProducts', async (req,res)=>{
-          const cursor = tourPlanCollection.find({});
-          const tourProducts = await cursor.toArray();
-          res.send(tourProducts);
-      })
+    //GET TOURPRODUCTS API===============
+    app.get('/tourProducts', async (req, res) => {
+      const cursor = tourPlanCollection.find({});
+      const tourProducts = await cursor.toArray();
+      res.send(tourProducts);
+    })
 
 
-      
+
     //   const result = await haiku.insertOne(doc);
     //   console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    } finally {
+  } finally {
     //   await client.close();
-    }
   }
-  run().catch(console.dir);
+}
+run().catch(console.dir);
 
- 
+
 app.get('/', (req, res) => {
   res.send('Hello sun tours india node')
 })
- 
+
 app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`)
+  //   console.log(`Example app listening at http://localhost:${port}`)
   console.log('server running at port', port)
 })
