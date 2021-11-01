@@ -34,14 +34,14 @@ async function run() {
       res.json(tourProducts);
     });
 
-    //Get api(orders) detabase to ui ================
+    //Get api(orders) detabase to ui ========
       app.get('/orders', async (req, res)=>{
         const cursor = orderCollection.find({});
         const orders = await cursor.toArray();
         res.send(orders);
       });
 
-    //  DELETE API===========================
+    //  DELETE API======================
     app.delete('/orders/:id', async (req,res)=>{
       const id = req.params.id;
       const query = {_id: ObjectId(id)};
